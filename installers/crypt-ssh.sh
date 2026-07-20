@@ -33,7 +33,6 @@ done
 
 # Install dracut-crypt-ssh package
 if command -v rpm-ostree >/dev/null 2>&1; then
-    local fedora_ver
     fedora_ver=$(rpm -E %fedora)
     wget -nv "https://copr.fedorainfracloud.org/coprs/uriesk/dracut-crypt-ssh/repo/fedora-${fedora_ver}/uriesk-dracut-crypt-ssh-fedora-${fedora_ver}.repo" \
         -O /etc/yum.repos.d/dracut-crypt-ssh.repo || true

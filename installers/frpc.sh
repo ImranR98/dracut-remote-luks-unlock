@@ -54,7 +54,6 @@ frpc_module_dir="$MODULES_BASE/99frpc"
 
 if [ ! -x "$frpc_cache" ]; then
     echo "Downloading frpc v$frpc_version..."
-    local tmp tar fname
     tmp="$(mktemp -d)"
     trap 'rm -rf "$tmp"' EXIT
     fname="frp_${frpc_version}_linux_amd64.tar.gz"

@@ -71,7 +71,7 @@ if [ -f "/home/$ssh_user/.ssh/authorized_keys" ]; then
 fi
 
 # Install pre-configured crypt-ssh.conf
-cp "$HERE/../modules/99crypt-ssh/crypt-ssh.conf" /etc/dracut.conf.d/crypt-ssh.conf
+cp "$HERE/modules/99crypt-ssh/crypt-ssh.conf" /etc/dracut.conf.d/crypt-ssh.conf
 
 if $do_rebuild; then
     rebuild_initramfs

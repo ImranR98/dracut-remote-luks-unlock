@@ -13,6 +13,29 @@ install() {
 
     instmods =drivers/net/wireless
 
+    # ---- install wireless firmware ------------------------------------------
+    # instmods resolves firmware via modinfo, which lists the max API version
+    # (e.g. iwlwifi-ty-a0-gf-a0-100.ucode).  The installed firmware package
+    # may only contain lower versions (e.g. -89).  Without explicitly copying
+    # the available firmware, the driver loads in the initramfs but fails the
+    # firmware request and never recovers after pivot_root.  Walk every
+    # wireless .ko that was actually included, derive a device prefix from
+    # each firmware alias, and install every matching file on the host.
+    local mod fw prefix
+    for mod in $(find "$initdir" -path "*/drivers/net/wireless/*.ko*" -printf '%f\n' 2>/dev/null | sed 's/\.ko.*//' | sort -u); do
+        for fw in $(modinfo -F firmware "$mod" 2>/dev/null); do
+            prefix="${fw%.ucode}"
+            prefix="${prefix%.pnvm}"
+            prefix="${prefix%-[0-9]*}"
+            prefix="${prefix%-c[0-9]*}"
+            [ -n "$prefix" ] || continue
+            for f in /lib/firmware/"${prefix}"*; do
+                [ -f "$f" ] && inst "$f"
+            done
+        done
+    done
+    # ------------------------------------------------------------------------
+
     local nm_ver
     nm_ver=${NM_VERSION:-$(NetworkManager --version)}
     inst_libdir_file "NetworkManager/$nm_ver/libnm-device-plugin-wifi.so"

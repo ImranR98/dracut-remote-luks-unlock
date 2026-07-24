@@ -43,17 +43,20 @@ if command -v rpm-ostree >/dev/null 2>&1; then
     fi
 else
     dnf copr enable uriesk/dracut-crypt-ssh -y
-    dnf install dracut-crypt-ssh -y
+    dnf reinstall dracut-crypt-ssh -y 2>/dev/null || dnf install dracut-crypt-ssh -y
 fi
 
-# Add rd.neednet=1 to kernel cmdline if not present
+# Add rd.neednet=1 to kernel cmdline
 if command -v rpm-ostree >/dev/null 2>&1; then
     if ! rpm-ostree kargs | grep -q neednet; then
         rpm-ostree kargs --append "rd.neednet=1 ip=dhcp" || true
     fi
-else
-    if ! grep -q "rd.neednet=1" /proc/cmdline 2>/dev/null; then
-        grubby --update-kernel=ALL --args="rd.neednet=1 ip=dhcp" || true
+elif command -v grubby >/dev/null 2>&1; then
+    grubby --update-kernel=ALL --args="rd.neednet=1 ip=dhcp" || true
+elif grep -q "^GRUB_CMDLINE_LINUX=" /etc/default/grub 2>/dev/null; then
+    if ! grep -q "rd.neednet=1" /etc/default/grub 2>/dev/null; then
+        sed -i 's/^GRUB_CMDLINE_LINUX="\(.*\)"/GRUB_CMDLINE_LINUX="\1 rd.neednet=1 ip=dhcp"/' /etc/default/grub
+        grub2-mkconfig -o "$(find /boot -name grub.cfg 2>/dev/null | head -1)" 2>/dev/null || true
     fi
 fi
 

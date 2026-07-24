@@ -25,6 +25,8 @@ rebuild_initramfs() {
 
 install_dracut_module() {
     local name="$1"
+    [ -n "$name" ] || { echo "Error: module name is required" >&2; return 1; }
+
     local src="$HERE/modules/$name"
     local dest="$MODULES_BASE/$name"
 
@@ -32,7 +34,6 @@ install_dracut_module() {
         dest="/etc/dracut/modules.d/$name"
     fi
 
-    mkdir -p "$dest"
     abort_if_root_only "$(dirname "$dest")" "dracut module directory"
 
     rm -rf "$dest"

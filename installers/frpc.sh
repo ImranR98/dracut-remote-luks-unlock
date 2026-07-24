@@ -57,7 +57,7 @@ if [ ! -x "$frpc_cache" ]; then
     tmp="$(mktemp -d)"
     trap 'rm -rf "$tmp"' EXIT
     fname="frp_${frpc_version}_linux_amd64.tar.gz"
-    wget -q "https://github.com/fatedier/frp/releases/download/v${frpc_version}/$fname" -O "$tmp/$fname"
+    curl -sfL "https://github.com/fatedier/frp/releases/download/v${frpc_version}/$fname" -o "$tmp/$fname"
     tar -xf "$tmp/$fname" -C "$tmp"
     mkdir -p "$CACHE_DIR"
     cp "$tmp/frp_${frpc_version}_linux_amd64/frpc" "$frpc_cache"
